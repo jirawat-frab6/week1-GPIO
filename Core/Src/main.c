@@ -92,7 +92,7 @@ int main(void)
   GPIO_PinState Switch_state[4][2] = {0};
   uint16_t LED1_Half_Period[4] = {1000,500,250,166}; // 1hz
   uint32_t LED_time_stamp[4] = {0},button_time_stamp = 0;
-  uint8_t mode1 = 0;
+  uint8_t mode1 = 0,mode2 = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -111,6 +111,9 @@ int main(void)
 			  LED1_time_stamp = HAL_GetTick();
 		  }
 	  }*/
+
+
+	  //button read
 	  uint8_t switch_trigger[4] = {0};
 	  if(HAL_GetTick() - button_time_stamp >= 100){
 		  button_time_stamp = HAL_GetTick();
@@ -119,13 +122,15 @@ int main(void)
 		  Switch_state[2][0] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5);
 		  Switch_state[3][0] = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4);
 		  for(int i = 0; i < 4;i++){
-			  if(Switch_state[i][1] == 1 && Switch_state[i][0] == 0){
+			  if(Switch_state[i][1] == 0 && Switch_state[i][0] == 1){
 				  switch_trigger[i] = 1;
 			  }
 			  Switch_state[i][1] = Switch_state[i][0];
 		  }
 	  }
 
+
+	  //mode 1 start
 	  if(switch_trigger[0]){
 		  mode1 = (mode1+1)%4;
 	  }
@@ -133,10 +138,16 @@ int main(void)
 		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, !HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9));
 		  LED_time_stamp[0] = HAL_GetTick();
 	  }
+	  //mode 1 end
+
+	  //mode 2 start
+	  if(switch_trigger[1]){
+		  mode2 = !mode2;
+	  }
+	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, mode2);
+	  //mode 2 end
 
 
-
-	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, 1);
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, 1);
 	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 1);
 
