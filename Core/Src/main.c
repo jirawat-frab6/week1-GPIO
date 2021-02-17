@@ -89,10 +89,10 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  GPIO_PinState Switch_state[4][2] = {0};
-  uint16_t LED1_Half_Period[4] = {1000,500,250,166},LED2_on_off_time = 500;
-  uint32_t LED1_time_stamp = 0,LED2_time_stamp = 0,button_time_stamp = 0;
-  uint8_t mode1 = 0,mode2 = 0;
+  GPIO_PinState Switch_state[4][2] = {{1,1},{1,1},{1,1},{1,1}};
+  uint16_t LED1_Half_Period[4] = {1000,500,250,166},LED2_on_off_time = 500,LED4_on_Periode[5] = {0,5,10,15,20};
+  uint32_t LED1_time_stamp = 0,LED2_time_stamp = 0,LED4_time_stamp = 0,button_time_stamp = 0;
+  uint8_t mode1 = 0,mode2 = 0,mode4 = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -158,8 +158,20 @@ int main(void)
 	  }
 	  //mode 3 end
 
+	  //mode 4 start (50 Hz)
+	  if(switch_trigger[3]){
+		  mode4 = (mode4+1)%5;
+	  }
+	  uint8_t delay = LED4_on_Periode[mode4];
+	  if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7)){
+		  delay = 20-LED4_on_Periode[mode4];
+	  }
+	  if(HAL_GetTick() - LED4_time_stamp >= delay){
+		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7,!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7));
+		  LED4_time_stamp = HAL_GetTick();
+	  }
+	  //mode 4 end
 
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
 
     /* USER CODE END WHILE */
 
